@@ -8,51 +8,255 @@
     body {
       margin: 0;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      height: 100vh;
     }
 
-    #fullscreenButton {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 9999;
+    #examTitle {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    #startButton {
+      padding: 15px 30px;
+      font-size: 18px;
+      cursor: pointer;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+      transition: background-color 0.3s ease;
+    }
+
+    #startButton:hover {
+      background-color: #2980b9;
     }
 
     #embeddedWebsite {
+      display: none;
       width: 100%;
-      height: 100vh; /* Set to 100% of the viewport height */
+      height: 100%;
       border: 0;
+    }
+
+    #cheaterMessage {
+      display: none;
+      font-size: 48px;
+      color: red;
+      margin-bottom: 20px;
+    }
+
+    #infoContainer {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    #infoMessage {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-top: 10px;
+    }
+
+    #adminButton {
+      display: none; /* Initially hidden */
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #27ae60;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+      transition: background-color 0.3s ease;
+    }
+
+    #adminButton:hover {
+      background-color: #219552;
+    }
+
+    #adminModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+    }
+
+    #adminInputContainer {
+      display: none; /* Initially hidden */
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #passwordInput {
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 200px;
+      outline: none;
+    }
+
+    #submitPasswordButton {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+      transition: background-color 0.3s ease;
+      width: 200px; /* Added width for consistency */
+      margin-top: 10px; /* Added margin for spacing */
+    }
+
+    #submitPasswordButton:hover {
+      background-color: #2980b9;
+    }
+
+    #closeButton {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      color: #fff;
+      background: none;
+      border: none;
+      outline: none;
     }
   </style>
 </head>
 <body>
-  <button id="fullscreenButton">Fullscreen</button>
+  <div id="examTitle">Al Abakera Exam</div>
+  <button id="startButton">Start</button>
   <iframe name="proprofs" id="embeddedWebsite" src="https://www.proprofs.com/quiz-school/ugc/story.php?title=el-3abakerajf&id=3928764&ew=430" allow="camera *;microphone *;fullscreen;"></iframe>
-  <div style='font-size:10px; font-family:Arial, Helvetica, sans-serif; text-align:left;'><a href='https://www.proprofs.com/quiz-school/solutions/assessment-software/' title='Create an Online Assessment' target='_blank'>Create an Online Assessment</a></div>
+  <div id="cheaterMessage">CHEATER!!</div>
+  <div id="infoContainer">
+    <div id="infoMessage">You were logged out of the exam because you left fullscreen.</div>
+    <div>Contact your administrator to re-enter the exam. Thank you.</div>
+  </div>
+  <button id="adminButton">Admin</button>
+  <div id="adminModal">
+    <button id="closeButton">X</button>
+    <div id="adminInputContainer">
+      <input type="password" id="passwordInput" placeholder="Enter password">
+      <button id="submitPasswordButton">Submit</button>
+    </div>
+  </div>
   <script>
-    const fullscreenButton = document.getElementById('fullscreenButton');
-    const embeddedWebsite = document.getElementById('embeddedWebsite');
+    document.addEventListener('DOMContentLoaded', () => {
+      const cheaterFlag = sessionStorage.getItem('cheaterFlag');
+      const startButton = document.getElementById('startButton');
+      const adminButton = document.getElementById('adminButton');
+      const embeddedWebsite = document.getElementById('embeddedWebsite');
+      const cheaterMessage = document.getElementById('cheaterMessage');
+      const infoContainer = document.getElementById('infoContainer');
+      const adminModal = document.getElementById('adminModal');
+      const passwordInput = document.getElementById('passwordInput');
+      const submitPasswordButton = document.getElementById('submitPasswordButton');
+      const closeButton = document.getElementById('closeButton');
+      const adminInputContainer = document.getElementById('adminInputContainer');
 
-    fullscreenButton.addEventListener('click', () => {
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen();
-      } else if (document.documentElement.mozRequestFullScreen) {
-        document.documentElement.mozRequestFullScreen();
-      } else if (document.documentElement.webkitRequestFullscreen) {
-        document.documentElement.webkitRequestFullscreen();
-      } else if (document.documentElement.msRequestFullscreen) {
-        document.documentElement.msRequestFullscreen();
-      }
-    });
+      if (cheaterFlag) {
+        cheaterMessage.style.display = 'block';
+        infoContainer.style.display = 'flex';
+        embeddedWebsite.style.display = 'none';
 
-    document.addEventListener('fullscreenchange', () => {
-      if (!document.fullscreenElement) {
-        window.location.href = 'https://www.youtube.com';
+        // Hide the Start button and Exam title if the "CHEATER!!" flag is present
+        startButton.style.display = 'none';
+        document.getElementById('examTitle').style.display = 'none';
+
+        // Show the Admin button only when the "CHEATER!!" message is displayed
+        adminButton.style.display = 'block';
+        adminInputContainer.style.display = 'block'; // Show the admin password input
       }
+
+      startButton.addEventListener('click', () => {
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+        } else if (document.documentElement.mozRequestFullScreen) {
+          document.documentElement.mozRequestFullScreen();
+        } else if (document.documentElement.webkitRequestFullscreen) {
+          document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) {
+          document.documentElement.msRequestFullscreen();
+        }
+
+        startButton.style.display = 'none';
+        embeddedWebsite.style.display = 'block';
+        cheaterMessage.style.display = 'none';
+        infoContainer.style.display = 'none';
+
+        // Remove the "CHEATER!!" flag when entering fullscreen
+        sessionStorage.removeItem('cheaterFlag');
+      });
+
+      adminButton.addEventListener('click', () => {
+        // Clear the admin password field when opening the admin modal
+        passwordInput.value = '';
+        adminModal.style.display = 'flex';
+      });
+
+      closeButton.addEventListener('click', () => {
+        // Clear the admin password field when closing the admin modal
+        passwordInput.value = '';
+        adminModal.style.display = 'none';
+      });
+
+      submitPasswordButton.addEventListener('click', () => {
+        const enteredPassword = passwordInput.value.trim();
+
+        if (enteredPassword === '23362841938') {
+          startButton.style.display = 'block';
+          adminButton.style.display = 'none'; // Hide the Admin button
+          adminInputContainer.style.display = 'none'; // Hide the admin password input
+          cheaterMessage.style.display = 'none';
+          infoContainer.style.display = 'none';
+          adminModal.style.display = 'none';
+        } else {
+          alert('Incorrect password. Please try again.');
+        }
+      });
+
+      document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+          // Check if the "CHEATER!!" flag is present in sessionStorage
+          const cheaterFlag = sessionStorage.getItem('cheaterFlag');
+
+          cheaterMessage.style.display = 'block';
+          infoContainer.style.display = 'flex';
+          embeddedWebsite.style.display = 'none';
+
+          // Set the "CHEATER!!" flag in sessionStorage
+          sessionStorage.setItem('cheaterFlag', 'true');
+
+          // Show the Admin button only when the "CHEATER!!" message is displayed
+          adminButton.style.display = 'block';
+          adminInputContainer.style.display = 'block'; // Show the admin password input
+        }
+      });
+
+      window.addEventListener('beforeunload', () => {
+        // Set the "CHEATER!!" flag in sessionStorage before leaving the page
+        sessionStorage.setItem('cheaterFlag', 'true');
+      });
     });
   </script>
 </body>
 </html>
-
-
-
-
